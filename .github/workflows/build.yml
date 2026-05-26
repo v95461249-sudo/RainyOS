@@ -7,19 +7,29 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsqlite3-dev lldd lld dtrace-cmd libffi-dev libssl-dev autoconf automake libtool pkg-config zlib1g-dev python3-pip
+        pip3 install --user --upgrade buildozer cython virtualenv
 
     - name: Build with Buildozer
-      uses: ArtemGovorov/buildozer-action@v1
-      with:
-        command: buildozer android debug
-        repository_root: .
+      run: |
+        export PATH=$PATH:~/.local/bin
+        buildozer android debug
 
     - name: Upload APK Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: RainyOS-APK
         path: .buildozer/android/app/build/outputs/apk/debug/*.apk
