@@ -10,23 +10,25 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
-    - name: Install dependencies
+    - name: Install Android SDK Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libsqlite3-dev lldd lld dtrace-cmd libffi-dev libssl-dev autoconf automake libtool pkg-config zlib1g-dev python3-pip
+        sudo apt-get install -y libsqlite3-dev lld dtrace-cmd libffi-dev libssl-dev autoconf automake libtool pkg-config zlib1g-dev python3-pip
         pip3 install --user --upgrade buildozer cython virtualenv
 
-    - name: Build with Buildozer
+    - name: Build Android APK with Buildozer
       run: |
         export PATH=$PATH:~/.local/bin
-        buildozer android debug
+        # Автоматически соглашаемся со всеми лицензиями Android SDK через yes
+        yes | buildozer android debug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
