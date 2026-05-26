@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
@@ -18,18 +18,18 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install Android SDK Dependencies
+    - name: Install Pure Minimal Dependencies
       run: |
-        # Игнорируем ошибку 100, если какое-то зеркало Ubuntu временно недоступно
         sudo apt-get update || true
-        # Ставим пакеты с флагом восстановления пропущенных ссылок
-        sudo apt-get install -y --fix-missing libsqlite3-dev lld dtrace-cmd libffi-dev libssl-dev autoconf automake libtool pkg-config zlib1g-dev python3-pip
+        # Оставили только самый неубиваемый минимум пакетов
+        sudo apt-get install -y git zip unzip encode libffi-dev libssl-dev autoconf automake libtool pkg-config zlib1g-dev python3-pip
         pip3 install --user --upgrade buildozer cython virtualenv
 
     - name: Build Android APK with Buildozer
       run: |
         export PATH=$PATH:~/.local/bin
-        # Автоматически принимаем все лицензии Google Android SDK
+        # Чистим старые кэши перед сборкой, если они были
+        buildozer ac_clean || true
         yes | buildozer android debug
 
     - name: Upload APK Artifact
